@@ -1,0 +1,8 @@
+.form-group .col-form-label:after{
+  color: red;
+  content: "*";
+  position: absolute;
+  margin-right: -15px;
+}
+
+

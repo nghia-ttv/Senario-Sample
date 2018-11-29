@@ -1,0 +1,160 @@
+
+  <div class="container">
+    <div class="reglist">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>DOB</th>
+          <th>Email</th>
+          <th>Country</th>
+          <th></th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let registration of registrations; let i = index">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>{{ registration.firstName }}</td>
+          <td>{{ registration.lastName }}</td>
+          <td>{{ registration.dob.day + '/' + registration.dob.month + '/' + registration.dob.year}}</td>
+          <td>{{ registration.email }}</td>
+          <td>{{ registration.country }}</td>
+          <td>
+            <button type="button" class="btn btn-info" style="width: 80px;"(click)="onEdit(i)">Edit</button>
+          </td>
+          <td>
+            <button type="button" class="btn btn-danger" style="width: 80px;" (click)="myBootstrapModal.open()">Delete</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="text-right">
+        <button type="submit" class="btn btn-primary" style="width: 80px;" (click)="onNew()">New</button>
+      </div>
+    </div>
+    <br>
+
+    <div  *ngIf="showNew">
+      <form   (ngSubmit)="onSave()">
+
+        <div [formGroup]="myGroup" novalidate>
+          <div class="form-group row">
+          <label  class="col-2 col-form-label" >First Name</label>
+          <div class="col-10">
+            <input class="form-control"
+                   [ngClass]="{'border border-danger': myGroup.controls['firstName'].invalid && (myGroup.controls['firstName'].dirty || myGroup.controls['firstName'].touched)
+                   ,'border border-danger': validateFirstName }"
+                   formControlName="firstName" placeholder="First Name" [(ngModel)]="regModel.firstName" required>
+            <div *ngIf="myGroup.controls['firstName'].invalid && (myGroup.controls['firstName'].dirty || myGroup.controls['firstName'].touched)" class="text-danger">
+              <div *ngIf="myGroup.controls['firstName'].errors.required">
+                First Name is required.
+              </div>
+              <div *ngIf="myGroup.controls['firstName'].errors.minlength">
+                First Name must be 3 characters long, we need another {{myGroup.controls['firstName'].errors.minlength.requiredLength - myGroup.controls['firstName'].errors.minlength.actualLength}} characters
+              </div>
+            </div>
+
+          </div>
+          </div>
+          <div class="form-group row">
+            <label  class="col-2 col-form-label" >Last Name</label>
+            <div class="col-10">
+              <input class="form-control" formControlName="lastName"
+                     [ngClass]="{'border border-danger': myGroup.controls['lastName'].invalid && (myGroup.controls['lastName'].dirty || myGroup.controls['lastName'].touched)
+                     ,'border border-danger': validateLastName }"
+                     placeholder="Last Name"
+                     [(ngModel)]="regModel.lastName" required>
+              <div *ngIf="myGroup.controls['lastName'].invalid && (myGroup.controls['lastName'].dirty || myGroup.controls['lastName'].touched)" class="text-danger">
+                <div  *ngIf="myGroup.controls['lastName'].errors.required">
+                  Last Name is required.
+                </div>
+                <div *ngIf="myGroup.controls['lastName'].errors.minlength">
+                  Last Name must be 3 characters long, we need another {{myGroup.controls['lastName'].errors.minlength.requiredLength - myGroup.controls['lastName'].errors.minlength.actualLength}} characters
+                </div>
+            </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label  class="col-2 col-form-label" >DOB</label>
+            <div class="col-10">
+              <input class="form-control"  style="width: 200px;" formControlName="dob" #dob="ngbDatepicker"
+                      [ngClass]="{'border border-danger': myGroup.controls['dob'].invalid && (myGroup.controls['dob'].dirty || myGroup.controls['dob'].touched)
+                      ,'border border-danger': validateDOB}"
+                      placeholder="yyyy-mm-dd"
+
+                     [(ngModel)]="regModel.dob" ngbDatepicker (click)="dob.toggle()">
+              <span class="add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+              <div  *ngIf="myGroup.controls['dob'].invalid && (myGroup.controls['dob'].dirty || myGroup.controls['dob'].touched)" class="text-danger">
+                <div *ngIf="myGroup.controls['dob'].errors.required">
+                  Date of Birth is required.
+                </div>
+              </div>
+          </div>
+
+
+          </div>
+          <div class="form-group row">
+            <label  class="col-2 " >Email</label>
+            <div class="col-10">
+              <input class="form-control" formControlName="email" [(ngModel)]="regModel.email" placeholder="Email" [ngClass]="{'border border-danger': myGroup.controls['email'].invalid && (myGroup.controls['email'].dirty || myGroup.controls['email'].touched)}" >
+              <div *ngIf="myGroup.controls['email'].invalid && (myGroup.controls['email'].dirty || myGroup.controls['email'].touched)" class="text-danger">
+                <div *ngIf="myGroup.controls['email'].errors.email">
+                  Email is incorrect
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label  class="col-2 col-form-label" >Password</label>
+            <div class="col-10">
+              <input class="form-control" type="password"
+                     [ngClass]="{'border border-danger': myGroup.controls['password'].invalid && (myGroup.controls['password'].dirty || myGroup.controls['password'].touched)
+                     ,'border border-danger': validatePassword}"
+                     formControlName="password" placeholder="Password" [(ngModel)]="regModel.password" required>
+              <div *ngIf="myGroup.controls['password'].invalid && (myGroup.controls['password'].dirty || myGroup.controls['password'].touched)" class="text-danger">
+                <div *ngIf="myGroup.controls['password'].errors.required">
+                  Password is required.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label  class="col-2" >Country</label>
+            <div class="col-10 dropdown" ngbDropdown myDrop="ngbDropdown">
+              <button type="button" class="btn btn-outline-primary"  name="country" ngbDropdownToggle>{{regModel.country}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                <button type="button" class="dropdown-item" *ngFor="let country of countries" (click)="onChangeCountry(country)">{{country}}</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success" style="width: 80px;">{{submitType}}</button>
+          <span >&nbsp;&nbsp;</span>
+          <button type="submit" class="btn btn-primary"style="width: 80px;"(click)="onCancel()">Cancel</button>
+
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <ngx-smart-modal #myBootstrapModal identifier="myBootstrapModal" style="width: 300px; padding-top:1px; " [closable]="false">
+    <div class="modal-header" style="height: 50px;margin-top: -15px;">
+      <p class="modal-title" style="font-size: 18px; font-weight: bold">Delete User</p>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="myBootstrapModal.close()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body" style="height: 67px;" >
+      <p class="py-1">Do you want to delete ?</p>
+    </div>
+    <div class="modal-footer" style="height: 60px; margin-bottom: -10px;" >
+      <button type="button" class="btn btn-primary" style="width: 80px;" (click)="onDelete(0)">Okay</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="myBootstrapModal.close()">Cancel
+      </button>
+    </div>
+  </ngx-smart-modal>
